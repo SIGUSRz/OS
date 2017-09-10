@@ -33,7 +33,10 @@ void *extract_head(struct list_type *l) {
   content = l->head->content;
   free(l->head);
   l->head = next_node;
-  l->count--; //Extra for Q7
+  if (l->head == NULL) {
+    l->tail = NULL;
+  }
+  l->count--; // Extra for Q7
   return content;
 }
 
@@ -48,7 +51,10 @@ void *extract_tail(struct list_type *l) {
   content = l->tail->content;
   free(l->tail);
   l->tail = prev_node;
-  l->count--; //Extra for Q7
+  if (l->tail == NULL) {
+    l->head = NULL;
+  }
+  l->count--; // Extra for Q7
   return content;
 }
 
