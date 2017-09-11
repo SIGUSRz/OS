@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+struct list_type *list;
+
 void init_queue() {
   list = malloc(sizeof(struct list_type));
   init_list(list);

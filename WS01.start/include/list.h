@@ -15,7 +15,6 @@ struct list_type {
   cell *tail;
   int count;
 };
-struct list_type *list;
 
 /* Initialization of the list */
 void init_list(struct list_type *l);

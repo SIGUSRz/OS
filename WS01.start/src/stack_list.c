@@ -2,6 +2,8 @@
 #include <list.h>
 #include <stdlib.h>
 
+struct list_type *list;
+
 /* Initialization of the stack */
 int init_stack() {
     list = malloc(sizeof(struct list_type));

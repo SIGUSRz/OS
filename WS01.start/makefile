@@ -29,7 +29,7 @@ $(OBJ)/stack_array.o: $(SRC)/stack_array.c $(INC)/stack.h
 	$(CC) -c -o $@ -D STACK_SIZE=5 $< $(CFLAGS)
 
 $(LIB)/libarray.a: $(OBJ)/stack_array.o
-	ar r $@ $<
+	ar rs $@ $<
 
 $(BIN)/array_test: $(OBJ)/stack_test.o $(LIB)/libarray.a
 	$(CC) -o $@ $^ $(CFLAGS)
