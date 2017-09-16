@@ -20,8 +20,10 @@ SRC = src
 # $(OBJ)/%.o: $(SRC)/%.c $(INC)/$(DEP)
 # 	$(CC) -c -o $@ $< $(CFLAGS)
 #######################################################################
-# Make for question 1-3
 all: run_all
+run_all: run_array run_list run_queue
+#######################################################################
+# Make for question 1-3
 $(OBJ)/stack_test.o: $(SRC)/stack_test.c $(INC)/stack.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
@@ -71,8 +73,6 @@ $(BIN)/fifo_test: $(OBJ)/fifo_test.o $(LIB)/libfifo.a
 run_queue: $(BIN)/fifo_test
 	echo "Testing Queue"
 	$(BIN)/fifo_test
-
-run_all: run_array run_list run_queue
 #######################################################################
 # General requirement for make clean, do not comment
 # Prevent operation on any files with name clean
