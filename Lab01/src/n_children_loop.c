@@ -8,13 +8,16 @@ int main(int argc, char *argv[]) {
     int pid, end;
     int i;
     if (argv[1] == NULL) {
-        printf("No Parameter\n");
-        return 0;
+        for (i = 0;i < N_CHILDREN && (pid = fork()) > 0;i++);
+        if (pid == 0) {
+            printf("Child process %d created by %d\n", getpid(), getppid());
+        }
+        exit(0);
     }
     char *flag = argv[1];
     switch (flag[0]) {
         case 'f':
-            for (i = 0;i < N_CHILDREN; i++) {
+            for (i = 0; i < N_CHILDREN; i++) {
                 pid = fork();
                 if (pid == 0) {
                     printf("Child process %d created by %d\n", getpid(), getppid());
@@ -28,7 +31,7 @@ int main(int argc, char *argv[]) {
             }
             break;
         case 'l':
-            for (i = 0;i < N_CHILDREN; i++) {
+            for (i = 0; i < N_CHILDREN; i++) {
                 pid = fork();
                 if (pid == 0) {
                     printf("Child process %d created by %d\n", getpid(), getppid());
