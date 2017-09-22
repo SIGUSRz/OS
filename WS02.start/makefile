@@ -12,26 +12,30 @@ SRC = src
 all: clean run_all
 run_all: run_1 run_2 run_3
 #######################################################################
-$(OBJ)/n_children_loop.o: $(SRC)/n_children_loop.c
+$(OBJ)/trace.o: $(SRC)/trace.c
 	$(CC) -c -o $@ $< $(CFLAGS)
-$(BIN)/n_children_loop: $(OBJ)/n_children_loop.o
+$(BIN)/trace: $(OBJ)/trace.o
 	$(CC) -o $@ $< $(CFLAGS)
-run_1: $(BIN)/n_children_loop
-	$(BIN)/n_children_loop
+run_1: $(BIN)/trace
+	$(BIN)/trace
 #######################################################################
-$(OBJ)/n_children_rec.o: $(SRC)/n_children_rec.c
+$(OBJ)/decoder.o: $(SRC)/decoder.c
 	$(CC) -c -o $@ $< $(CFLAGS)
-$(BIN)/n_children_rec: $(OBJ)/n_children_rec.o
+$(BIN)/decoder: $(OBJ)/decoder.o
 	$(CC) -o $@ $< $(CFLAGS)
-run_2: $(BIN)/n_children_rec
-	$(BIN)/n_children_rec last
+run_2: $(BIN)/decoder
+	$(BIN)/decoder
 #######################################################################
-$(OBJ)/compile.o: $(SRC)/compile.c
+$(OBJ)/converters.o: $(SRC)/converters.c $(INC)/converters.h
 	$(CC) -c -o $@ $< $(CFLAGS)
-$(BIN)/compile: $(OBJ)/compile.o
-	$(CC) -o $@ $< $(CFLAGS)
-run_3: $(BIN)/compile
-	$(BIN)/compile n_children_loop n_children_rec
+$(LIB)/lib.a: $(OBJ)/converters.o
+	ar rs $@ $<
+$(OBJ)/multi_converter.o: $(SRC)/multi_converter.c $(INC)/converters.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+$(BIN)/multi_converter: $(OBJ)/multi_converter.o $(LIB)/lib.a $(INC)/converters.h
+	$(CC) -o $@ $(OBJ)/multi_converter.o $(LIB)/lib.a $(CFLAGS)
+run_3: $(BIN)/multi_converter
+	$(BIN)/multi_converter CNY 100.000
 #######################################################################
 # General requirement for make clean, do not comment
 # Prevent operation on any files with name clean

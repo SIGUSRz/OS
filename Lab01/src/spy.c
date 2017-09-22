@@ -44,10 +44,14 @@ int main(int argc, char **argv)
             perror("read");
         else if (or > 0) {
             command_size = cut_down(buf, (char**)command);
-            if (command_size == 1) {
-                execlp("/bin/sh", command, 0);
-            } else {
-                execvp("/bin/sh", command, 0);
+            if (fork() == 0) {
+                if (command_size == 2) {
+                    execlp(command[0], command[0], command[1], NULL);
+                } else {
+                    execvp(command[0], &command[0], NULL);
+                } else {
+                    wait(0);
+                }
             }
         }
     }
