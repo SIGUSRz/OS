@@ -1,7 +1,7 @@
 # Shi Zeng sz1358 Homework 2
 
 ## Question 1
-1. 5 processes.
+1. 6 processes.
 2. ![Family Tree](tree.png)
 
     * C1: i = 0
@@ -16,3 +16,4 @@
 See decoder.c
 
 ## Question 3
+See multi_converter.c
