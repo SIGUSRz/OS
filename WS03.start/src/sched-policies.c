@@ -404,9 +404,19 @@ int IORR(task tasks[], int nbOfTasks, sched_data* schedData, int currentTime, in
     if (i != -1) {
         if (tasks[i].state == RUNNING) {
             if (tasks[i].executionTime == tasks[i].computationTime) {
-                tasks[i].state = TERMINATED;
-                for (j = k; j < MAX_NB_OF_TASKS - 1; j++) {
-                    schedData->queues[0][j] = schedData->queues[0][j+1];
+                if (tasks[i].ioCycle != 0 && tasks[i].executionTime % tasks[i].ioCycle == 0) {
+                    tasks[i].state = SLEEPING;
+                    tasks[i].ioTime = 0;
+                    int temp = schedData->queues[0][k];
+                    for (j = k; j < MAX_NB_OF_TASKS - 1; j++) {
+                        schedData->queues[0][j] = schedData->queues[0][j+1];
+                    }
+                    schedData->queues[0][num_task - 1] = temp;
+                } else {
+                    tasks[i].state = TERMINATED;
+                    for (j = k; j < MAX_NB_OF_TASKS - 1; j++) {
+                        schedData->queues[0][j] = schedData->queues[0][j+1];
+                    }
                 }
             } else {
                 if (tasks[i].quanTime % quantum == 0) {
@@ -444,7 +454,12 @@ int IORR(task tasks[], int nbOfTasks, sched_data* schedData, int currentTime, in
         i = schedData->queues[0][j];
         if (tasks[i].state == SLEEPING) {
             if (tasks[i].ioCycle != 0 && tasks[i].ioTime == tasks[i].ioLength) {
-                tasks[i].state = READY;
+                if (tasks[i].executionTime == tasks[i].computationTime) {
+                    tasks[i].state = TERMINATED;
+                } else {
+                    // printf("hey %d\n", i);
+                    tasks[i].state = READY;
+                }
             } else {
                 tasks[i].ioTime++;
             }
@@ -457,6 +472,9 @@ int IORR(task tasks[], int nbOfTasks, sched_data* schedData, int currentTime, in
     // Otherwise, elect the ·first task in the queue
     i = schedData->queues[0][k];
     if (i != -1) {
+        if (tasks[i].state == SLEEPING || tasks[i].state == TERMINATED) {
+            return -1;
+        }
         tasks[i].executionTime++;
         tasks[i].quanTime++;
         tasks[i].state = RUNNING;
