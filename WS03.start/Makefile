@@ -8,6 +8,9 @@ INC = include
 LIB = lib
 OBJ = obj
 SRC = src
+OUT = out
+#SRTF, FCFS, SJF, RR, MFQ, IORR
+TAG = IORR
 
 all: clean build run_all
 
@@ -17,8 +20,7 @@ build: clean
 	gcc $(CFLAGS) -o bin/sched-simulator obj/simulator.o obj/policies.o
 
 run_all:
-	bin/sched-simulator "tasks" 1>sched-run.txt
-	cat sched-run.txt
+	bin/sched-simulator tasks2 $(TAG) 4 1>$(OUT)/$(TAG).txt
 
 clean:
 	rm -f ${OBJ}/* ${BIN}/* ${LIB}/*
