@@ -235,7 +235,7 @@ int RR(task tasks[], int nbOfTasks, sched_data* schedData, int currentTime, int 
                     schedData->queues[0][j] = schedData->queues[0][j+1];
                 }
             } else {
-                if (tasks[i].quanTime % quantum == 0) {
+                if (tasks[i].quanTime == quantum) {
                     tasks[i].state = READY;
                     tasks[i].quanTime = 0;
                     int temp = schedData->queues[0][0];
@@ -274,7 +274,7 @@ int MFQ(task tasks[], int nbOfTasks, sched_data* schedData, int currentTime, int
     if (currentTime == 0) {
         printf("Initializing job queue\n");
         schedData->nbOfQueues = 3;
-        for (k = 0; k < schedData->nbOfQueues; k++) {
+        for (k = 0; k < sch·edData->nbOfQueues; k++) {
             for (i = 0; i < MAX_NB_OF_TASKS; i++) {
                 schedData->queues[k][i] = -1;
             }
@@ -289,7 +289,7 @@ int MFQ(task tasks[], int nbOfTasks, sched_data* schedData, int currentTime, int
         if ((tasks[i].state == UPCOMING) && (tasks[i].arrivalDate == currentTime)) {
             tasks[i].state = READY;
             tasks[i].waitTime = 0;
-            tasks[i].quanTime = 1;
+            tasks[i].quanTime = 0;
             schedData->queues[0][j] = i;
             j++;
         }
@@ -317,9 +317,9 @@ int MFQ(task tasks[], int nbOfTasks, sched_data* schedData, int currentTime, int
                     schedData->queues[k][j] = schedData->queues[k][j+1];
                 }
             } else {
-                if (tasks[i].quanTime % (quantum * (k + 1)) == 0) {
+                if (tasks[i].quanTime == quantum) {
                     tasks[i].state = READY;
-                    tasks[i].quanTime = 1;
+                    tasks[i].quanTime = 0;
                     int temp = schedData->queues[k][0];
                     for (j = 0; j < MAX_NB_OF_TASKS - 1; j++) {
                         schedData->queues[k][j] = schedData->queues[k][j+1];
@@ -404,7 +404,7 @@ int IORR(task tasks[], int nbOfTasks, sched_data* schedData, int currentTime, in
     if (i != -1) {
         if (tasks[i].state == RUNNING) {
             if (tasks[i].executionTime == tasks[i].computationTime) {
-                if (tasks[i].ioCycle != 0 && tasks[i].executionTime % tasks[i].ioCycle == 0) {
+                if (tasks[i].ioCycle != 0 && tasks[i].executionTime == tasks[i].ioCycle) {
                     tasks[i].state = SLEEPING;
                     tasks[i].ioTime = 0;
                     int temp = schedData->queues[0][k];
@@ -419,8 +419,8 @@ int IORR(task tasks[], int nbOfTasks, sched_data* schedData, int currentTime, in
                     }
                 }
             } else {
-                if (tasks[i].quanTime % quantum == 0) {
-                    if (tasks[i].ioCycle != 0 && tasks[i].executionTime % tasks[i].ioCycle == 0) {
+                if (tasks[i].quanTime == quantum) {
+                    if (tasks[i].ioCycle != 0 && tasks[i].executionTime == tasks[i].ioCycle) {
                         tasks[i].state = SLEEPING;
                     } else {
                         tasks[i].state = READY;
@@ -432,7 +432,7 @@ int IORR(task tasks[], int nbOfTasks, sched_data* schedData, int currentTime, in
                     }
                     schedData->queues[0][num_task - 1] = temp;
                 } else {
-                    if (tasks[i].ioCycle != 0 && tasks[i].executionTime % tasks[i].ioCycle == 0) {
+                    if (tasks[i].ioCycle != 0 && tasks[i].executionTime == tasks[i].ioCycle) {
                         tasks[i].state = SLEEPING;
                         tasks[i].quanTime = 0;
                         tasks[i].ioTime = 0;
@@ -457,7 +457,6 @@ int IORR(task tasks[], int nbOfTasks, sched_data* schedData, int currentTime, in
                 if (tasks[i].executionTime == tasks[i].computationTime) {
                     tasks[i].state = TERMINATED;
                 } else {
-                    // printf("hey %d\n", i);
                     tasks[i].state = READY;
                 }
             } else {
