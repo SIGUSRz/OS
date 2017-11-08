@@ -11,7 +11,7 @@ SRC = src
 OUT = out
 
 all: clean run_all
-run_all: run_3
+run_all: run_4
 #######################################################################
 $(OBJ)/sleep.o: $(SRC)/sleep.c
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -29,12 +29,19 @@ $(BIN)/wave: $(OBJ)/wave.o
 run_2: $(BIN)/wave
 	$(BIN)/wave
 #######################################################################
-$(OBJ)/sync.o: $(SRC)/sync.c
+$(OBJ)/double_sync.o: $(SRC)/double_sync.c
 	$(CC) -c -o $@ $< $(CFLAGS)
-$(BIN)/sync: $(OBJ)/sync.o
+$(BIN)/double_sync: $(OBJ)/double_sync.o
 	$(CC) -o $@ $< $(CFLAGS)
-run_3: $(BIN)/sync
-	$(BIN)/sync
+run_3: $(BIN)/double_sync
+	$(BIN)/double_sync
+#######################################################################
+$(OBJ)/single_sync.o: $(SRC)/single_sync.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+$(BIN)/single_sync: $(OBJ)/single_sync.o
+	$(CC) -o $@ $< $(CFLAGS)
+run_4: $(BIN)/single_sync
+	$(BIN)/single_sync
 #######################################################################
 # General requirement for make clean, do not comment
 # Prevent operation on any files with name clean
