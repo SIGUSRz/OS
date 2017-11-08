@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
         N = atoi(argv[1]);
     }
 
-    root_pid = getpid();
+    root_pid = getppid();
     struct sigaction action;
     action.sa_handler = &handler;
 

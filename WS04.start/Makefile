@@ -11,7 +11,7 @@ SRC = src
 OUT = out
 
 all: clean run_all
-run_all: run_4
+run_all: run_2
 #######################################################################
 $(OBJ)/sleep.o: $(SRC)/sleep.c
 	$(CC) -c -o $@ $< $(CFLAGS)

@@ -1,4 +1,5 @@
 .DS_Store
 *.tgz
+*.tar.gz
 *.iml
 .idea/
