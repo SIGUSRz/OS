@@ -54,6 +54,7 @@ int main(int argc, char *argv[]) {
     sigfillset(&full_mask);
     sigset_t empty_mask;
     sigemptyset(&empty_mask);
+    sigprocmask(SIG_SETMASK, &full_mask, NULL);
 
     int i;
     for (i = 0; i != N && (child_pid = fork()) == 0; i++) ;

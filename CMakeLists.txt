@@ -6,14 +6,13 @@ project(OS)
 
 set(CMAKE_C_STANDARD 99)
 
-file(GLOB HW4_src "WS04.start/src/*.c")
-file(GLOB HW4_head "WS04.start/include/*.h")
 set (INCLUDE "")
-foreach (_headerFile ${HW4_head})
+file(GLOB src "WS04.start/src/*.c" "Lab04/src/*.c")
+file(GLOB head "WS04.start/include/*.h" "Lab04/include/*.h")
+foreach (_headerFile ${head})
     get_filename_component(_dir ${_headerFile} PATH)
     list (APPEND INCLUDE ${_dir})
 endforeach()
-list(REMOVE_DUPLICATES INCLUDE)
 
-add_executable(Execute ${HW4_src})
+add_executable(Execute ${src})
 target_include_directories(Execute PRIVATE ${INCLUDE})

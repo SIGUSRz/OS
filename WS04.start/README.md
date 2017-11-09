@@ -1,15 +1,20 @@
 # Shi Zeng sz1358 Homework 4
 
 ## Question 1
-In makefile, change run_all command at line 14 to run_1 to run sleep_test.c that calls mysleep function.
+Implemented in sleep.c, with sleep-test.c as main function to test.
+Linked by include/head.h
+
+* make run_1: compile and run sleep_test.c that calls mysleep function.
 
 ## Question 2
-In makefile, change run_all command at line 14 to run_2 to run wave.c
+Implemented in wave.c
+* make run_2: compile and run wave.c
 
 ## Question 3.1
-In makefile, change run_all command at line 14 to run_3 to run alarm function that uses two signals SIGUSR1 and SIGUSR2. 
-In this way the minimum number of signal emissions is 4.
+Implemented in double_sync.c using SIGUSR1 and SIGUSR2
+* make run_3: compile and run double_sync.c
 
 ## Question 3.2
-In makefile, change run_all command at line 14 to run_4 to run alarm function that uses only one signal SIGUSR1.
+Implemented in single_sync.c using only SIGUSR1
+* make run_4: compile and run single_sync.c
 
