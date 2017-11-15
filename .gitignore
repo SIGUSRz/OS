@@ -3,3 +3,4 @@
 *.tar.gz
 *.iml
 .idea/
+cmake-build-debug/
