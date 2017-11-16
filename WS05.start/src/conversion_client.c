@@ -1,10 +1,16 @@
 #include <header.h>
 
-char *client_memory, *server_memory;
-response *res;
-req_queue *queue;
-char *sem_queue_name, *sem_req_name, *sem_serverRecv_name, *sem_clientRecv_name;
-sem_t *sem_queue, *sem_req, *sem_serverRecv, *sem_clientRecv;
+char *server_memory; // Shared File Name of Server Request Queue
+req_queue *queue; // Shared Server Queue
+char *client_memory[N]; // Shared File Name of Client Result Array
+float *res[N]; // Shared Client Memory
+
+// File Names
+char *sem_queue_name, *sem_req_name, *sem_serverRecv_name, *sem_clientRecv_name[N];
+sem_t *sem_queue; // Semaphore to protect queue action
+sem_t *sem_req; // Semaphore to protect pending client request when request queue is full
+sem_t *sem_serverRecv; // Semaphore for client to pend and wake server parent process
+sem_t *sem_clientRecv[N]; // Semaphore to notify client to read results
 
 void newClientResultMemory(int client_id);
 void quoteServerQueueMemory(int server_id);
@@ -40,10 +46,10 @@ int main(int argc, char *argv[]) {
     sem_post(sem_queue);
     sem_post(sem_serverRecv);
 
-    sem_wait(sem_clientRecv);
     int i;
     for (i = 0; i < N; i++) {
-        printf("%.2f %s -> %.2f %s\n", amount, argv[3], res->result[i], determine_currency(i));
+        sem_wait(sem_clientRecv[i]);
+        printf("%.2f %s -> %.2f %s\n", amount, argv[3], *res[i], determine_currency(i));
     }
 
     clean(SIGINT);
@@ -53,16 +59,19 @@ int main(int argc, char *argv[]) {
 
 void newClientResultMemory(int client_id) {
     int client_fd;
-    asprintf(&client_memory, "/client_%d_shm:0", client_id);
-    if ((client_fd = shm_open(client_memory, O_RDWR | O_CREAT, 0600)) == -1) {
-        perror("client_memory shm_open");
-        exit(-1);
+    int i;
+    for (i = 0; i < N; i++) {
+        asprintf(&client_memory[i], "/client_%d_shm:%d", client_id, i);
+        if ((client_fd = shm_open(client_memory[i], O_RDWR | O_CREAT, 0600)) == -1) {
+            perror("client_memory shm_open");
+            exit(-1);
+        }
+        if ((ftruncate(client_fd, sizeof(float))) == -1) {
+            perror("client_memory ftruncate");
+            exit(-1);
+        }
+        res[i] = (float *)mmap(NULL, sizeof(float), PROT_READ | PROT_WRITE, MAP_SHARED, client_fd, 0);
     }
-    if ((ftruncate(client_fd, sizeof(response))) == -1) {
-        perror("client_memory ftruncate");
-        exit(-1);
-    }
-    res = (response *)mmap(NULL, sizeof(response), PROT_READ | PROT_WRITE, MAP_SHARED, client_fd, 0);
 }
 
 void quoteServerQueueMemory(int server_id) {
@@ -94,30 +103,35 @@ void newClientSemaphore(int server_id, int client_id) {
         exit(-1);
     }
 
-    asprintf(&sem_clientRecv_name, "/clientRecv_%d_sem", client_id);
-    if ((sem_clientRecv = sem_open(sem_clientRecv_name, O_CREAT | O_EXCL | O_RDWR, 0666, 0)) == SEM_FAILED) {
-        perror("sem_serverRecv sem_open failed");
-        exit(-1);
+    int i;
+    for (i = 0; i < N; i++) {
+        asprintf(&sem_clientRecv_name[i], "/clientRecv_%d_sem:%d", client_id, i);
+        if ((sem_clientRecv[i] = sem_open(sem_clientRecv_name[i], O_CREAT | O_EXCL | O_RDWR, 0666, 0)) == SEM_FAILED) {
+            perror("sem_serverRecv sem_open failed");
+            exit(-1);
+        }
     }
 }
 
 void clean(int signal) {
+    int i;
     sem_close(sem_queue);
     sem_close(sem_req);
     sem_close(sem_serverRecv);
-    sem_close(sem_clientRecv);
+    for (i = 0; i < N; i++) {
+        sem_close(sem_clientRecv[i]);
+        sem_unlink(sem_clientRecv_name[i]);
+        munmap(res[i], sizeof(float));
+        shm_unlink(client_memory[i]);
+    }
 
-    sem_unlink(sem_clientRecv_name);
     free(sem_queue_name);
     free(sem_req_name);
     free(sem_serverRecv_name);
 
     munmap(queue, sizeof(req_queue));
-    munmap(res, sizeof(float));
 
-    shm_unlink(client_memory);
-
-    printf("Done Clean\n");
+    printf("Process Done Clean\n");
 
     exit(0);
 }

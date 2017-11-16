@@ -22,6 +22,7 @@ $(BIN)/conversion_client: $(OBJ)/conversion_client.o $(OBJ)/utils.o
 $(BIN)/conversion_server: $(OBJ)/conversion_server.o $(OBJ)/utils.o
 	$(CC) -o $@ $^ $(CFLAGS)
 run_client: $(BIN)/conversion_client
+	$(BIN)/conversion_client 404 1 EUR 100.0
 run_server: $(BIN)/conversion_server
 	$(BIN)/conversion_server 404
 ######################################################################

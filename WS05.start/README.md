@@ -23,7 +23,7 @@ header:
 then to binary executable conversion_server, and execute it.
 * make run_client: compile conversion_client.c to object file conversion_client.o
 then to binary executable conversion_client, and execute it.
-* ./run.sh: run run.sh script to compile conversion_client.c and concurrently run several clients. 
+* ./run.sh: run run.sh script to compile conversion_client.c and concurrently run several clients.
 
 ## Question 2
 
