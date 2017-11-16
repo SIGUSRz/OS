@@ -55,11 +55,11 @@ void newClientResultMemory(int client_id) {
     int client_fd;
     asprintf(&client_memory, "/client_%d_shm:0", client_id);
     if ((client_fd = shm_open(client_memory, O_RDWR | O_CREAT, 0600)) == -1) {
-        perror("client side client shm_open");
+        perror("client_memory shm_open");
         exit(-1);
     }
     if ((ftruncate(client_fd, sizeof(response))) == -1) {
-        perror("client side client ftruncate");
+        perror("client_memory ftruncate");
         exit(-1);
     }
     res = (response *)mmap(NULL, sizeof(response), PROT_READ | PROT_WRITE, MAP_SHARED, client_fd, 0);
@@ -69,7 +69,7 @@ void quoteServerQueueMemory(int server_id) {
     int server_fd;
     asprintf(&server_memory, "/server_%d_shm:0", server_id);
     if ((server_fd = shm_open(server_memory, O_RDWR, 0600)) == -1) {
-        perror("client side server shm_open");
+        perror("server_queue shm_open");
         exit(-1);
     }
     queue = (req_queue *)mmap(NULL, sizeof(req_queue), PROT_READ | PROT_WRITE, MAP_SHARED, server_fd, 0);
@@ -78,25 +78,25 @@ void quoteServerQueueMemory(int server_id) {
 void newClientSemaphore(int server_id, int client_id) {
     asprintf(&sem_queue_name, "/queue_%d_sem", server_id);
     if ((sem_queue = sem_open(sem_queue_name, O_RDWR)) == SEM_FAILED) {
-        perror("client sem_queue sem_open failed");
+        perror("sem_queue sem_open failed");
         exit(-1);
     }
 
     asprintf(&sem_req_name, "/req_%d_sem", server_id);
     if ((sem_req = sem_open(sem_req_name, O_RDWR)) == SEM_FAILED) {
-        perror("client sem_req sem_open failed");
+        perror("sem_req sem_open failed");
         exit(-1);
     }
 
     asprintf(&sem_serverRecv_name, "/serverRecv_%d_sem", server_id);
     if ((sem_serverRecv = sem_open(sem_serverRecv_name, O_RDWR)) == SEM_FAILED) {
-        perror("client sem_serverRecv sem_open failed");
+        perror("sem_serverRecv sem_open failed");
         exit(-1);
     }
 
     asprintf(&sem_clientRecv_name, "/clientRecv_%d_sem", client_id);
     if ((sem_clientRecv = sem_open(sem_clientRecv_name, O_CREAT | O_EXCL | O_RDWR, 0666, 0)) == SEM_FAILED) {
-        perror("client sem_serverRecv sem_open failed");
+        perror("sem_serverRecv sem_open failed");
         exit(-1);
     }
 }
@@ -116,6 +116,8 @@ void clean(int signal) {
     munmap(res, sizeof(float));
 
     shm_unlink(client_memory);
+
+    printf("Done Clean\n");
 
     exit(0);
 }

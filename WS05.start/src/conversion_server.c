@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
     struct sigaction action;
     action.sa_handler = &clean;
-    int sig;
+//    int sig;
 //    for (sig = 0; sig < NSIG; sig++) {
 //        sigaction(sig, &action, NULL);
 //    }
@@ -69,11 +69,11 @@ void newServerQueueMemory(int server_id) {
     int server_fd;
     asprintf(&server_memory, "/server_%d_shm:0", server_id);
     if((server_fd = shm_open(server_memory, O_CREAT | O_EXCL | O_RDWR, 0600)) == -1) {
-        perror("Server Side shm_open failed");
+        perror("server_memory shm_open failed");
         exit(-1);
     }
     if (ftruncate(server_fd, sizeof(req_queue)) == -1) {
-        perror("Server Side ftruncate failed");
+        perror("server_memory ftruncate failed");
         exit(-1);
     }
     queue = (req_queue *)mmap(NULL, sizeof(req_queue),
@@ -84,7 +84,7 @@ void quoteClientResultMemory(int client_id) {
     int client_fd;
     asprintf(&client_memory, "/client_%d_shm:0", client_id);
     if ((client_fd = shm_open(client_memory, O_RDWR, 0600)) == -1) {
-        perror("client side server shm_open");
+        perror("client_memory shm_open failed");
         exit(-1);
     }
     res = (response *)mmap(NULL, sizeof(response), PROT_READ | PROT_WRITE, MAP_SHARED, client_fd, 0);
@@ -93,20 +93,20 @@ void quoteClientResultMemory(int client_id) {
 void newServerSemaphore(int server_id) {
     asprintf(&sem_queue_name, "/queue_%d_sem", server_id);
     if ((sem_queue = sem_open(sem_queue_name, O_CREAT | O_EXCL | O_RDWR, 0666, 1)) == SEM_FAILED) {
-        perror("server sem_queue sem_open failed");
+        perror("sem_queue sem_open failed");
         exit(-1);
     }
 
     asprintf(&sem_req_name, "/req_%d_sem", server_id);
     if ((sem_req = sem_open(sem_req_name, O_CREAT | O_EXCL | O_RDWR, 0666, LENGTH)) == SEM_FAILED) {
-        perror("server sem_req sem_open failed");
+        perror("sem_req sem_open failed");
         exit(-1);
     }
 
     asprintf(&sem_serverRecv_name, "/serverRecv_%d_sem", server_id);
     if ((sem_serverRecv = sem_open(sem_serverRecv_name,
                                       O_CREAT | O_EXCL | O_RDWR, 0666, 0)) == SEM_FAILED) {
-        perror("server sem_serverRecv sem_open failed");
+        perror("sem_serverRecv sem_open failed");
         exit(-1);
     }
 }
@@ -114,7 +114,7 @@ void newServerSemaphore(int server_id) {
 void quoteClientSemaphore(int client_id) {
     asprintf(&sem_clientRecv_name, "/clientRecv_%d_sem", client_id);
     if ((sem_clientRecv = sem_open(sem_clientRecv_name, O_RDWR)) == SEM_FAILED) {
-        perror("server sem_clientRecv failed");
+        perror("sem_clientRecv failed");
         exit(-1);
     }
 }
